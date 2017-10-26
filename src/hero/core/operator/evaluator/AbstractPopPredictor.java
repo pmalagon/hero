@@ -127,5 +127,71 @@ public abstract class AbstractPopPredictor {
         javaCode.append(generateClassFooter());
         return javaCode.toString();
     }
-
+        public static String generateClassMainC(Integer threadId,ArrayList<String> phenotypes,Integer NumCol,String Path) {
+        StringBuilder currentCFile = new StringBuilder();
+        currentCFile.append("#include <stdlib.h>\n");
+        currentCFile.append("#include <math.h>\n");
+        currentCFile.append("#include <string.h>\n");
+        currentCFile.append("#include <stdio.h>\n");
+        currentCFile.append("#include \"PopPredictor1.h\"\n\n");
+        currentCFile.append("#define COLUMN_SIZE ").append(NumCol).append("\n");
+        currentCFile.append("#define NUM_IND ").append(phenotypes.size()).append("\n\n");
+        currentCFile.append("FILE* dataTable,* fitTable;\n");
+        currentCFile.append("char dataLine[100];\n");
+        currentCFile.append("char *token;\n");
+        currentCFile.append("double data[COLUMN_SIZE];\n");
+        currentCFile.append("double fit[NUM_IND]; \n");
+        currentCFile.append("int main(int argc, char** argv){\n");
+        currentCFile.append("\tfunc_t func_array[NUM_IND]={\n\t\t");
+        for (int i = 0; i < phenotypes.size()-1; ++i) {
+            currentCFile.append("predictorNum").append(i).append(",");
+            if(i%5==0){
+            currentCFile.append("\n\t\t");
+            }
+        }
+        currentCFile.append("predictorNum").append(phenotypes.size()-1).append("};\n\n");
+        currentCFile.append("\tdataTable = fopen(\"").append(Path).append("\", \"r\");\n");
+        currentCFile.append("\twhile(fscanf(dataTable, \"%[^\\n]%*c\",dataLine) == 1){\n");
+        currentCFile.append("\t\ttoken = strtok(dataLine, \";\");\n");
+        currentCFile.append("\t\tfor(int i=0;i<COLUMN_SIZE;i++){\n");
+        currentCFile.append("\t\t\tdata[i]= atof(token);\n");
+        currentCFile.append("\t\t\ttoken = strtok(NULL, \";\");}\n");
+        currentCFile.append("\t\tfor(int j=0;j<NUM_IND;j++){\n");
+        currentCFile.append("\t\t\tif(data[0]!=func_array[j](data)){\n");
+        currentCFile.append("\t\t\tfit[j]++;}}}\n");
+        currentCFile.append("\tfclose(dataTable);\n");
+        currentCFile.append("\tfitTable = fopen(\"test/fitGESM.csv\", \"w+\");\n");
+        currentCFile.append("\tfor(int k=0;k<NUM_IND;k++){\n");
+        currentCFile.append("\t\tfprintf(fitTable, \"%.2f\\n\",fit[k]);}\n");
+        currentCFile.append("\tfclose(fitTable);\n");
+        currentCFile.append("return 0;}\n");
+        return currentCFile.toString();      
+    }
+    public static String generateUpdatePredictorC(ArrayList<String> phenotypes) {
+        StringBuilder currentCFile = new StringBuilder();
+        // FUNCTIONS STRUCTURE
+        currentCFile.append("#include <stdlib.h>\n");
+        currentCFile.append("#include <math.h>\n");
+        currentCFile.append("#include \"PopPredictor1.h\"\n");
+        for (int i = 0; i < phenotypes.size(); ++i) {
+            String expression = phenotypes.get(i);
+            currentCFile.append("double predictorNum").append(i).append("(double* v) {\n");
+            currentCFile.append(expression);
+            currentCFile.append("}\n\n");
+        }
+        return currentCFile.toString();
+    }
+    public static String generateUpdatePredictorHeaderC(ArrayList<String> phenotypes) {
+        StringBuilder currentCFile = new StringBuilder();
+        // FUNCTIONS STRUCTURE
+        currentCFile.append("#ifndef _POPPREDICTOR1_H\n");
+        currentCFile.append("#define _POPPREDICTOR1_H\n");
+        currentCFile.append("typedef double (*func_t)(double*);\n");
+        for (int i = 0; i < phenotypes.size(); ++i) {
+            currentCFile.append("double predictorNum").append(i).append("(double* v);\n");
+        }
+        currentCFile.append("#endif\n");
+        return currentCFile.toString();
+    }
+}
 }
