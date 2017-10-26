@@ -18,11 +18,7 @@
  *  - José Luis Risco Martín
  */
 package hero.core.algorithm.metaheuristic.ge;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -45,6 +41,8 @@ import hero.core.util.DataTable;
 import hero.core.util.compiler.MyCompiler;
 import hero.core.util.compiler.MyLoader;
 import hero.core.util.logger.HeroLogger;
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 /**
  * Class to develop "static" (non-temporal) models
@@ -52,7 +50,7 @@ import hero.core.util.logger.HeroLogger;
  * version that I developed for Patricia.
  */
 public class GramEvalStaticModel extends AbstractProblemGE {
-
+    public int flag=0;
     private static final Logger LOGGER = Logger.getLogger(GramEvalStaticModel.class.getName());
 
     protected String bnfFilePath;
@@ -76,7 +74,9 @@ public class GramEvalStaticModel extends AbstractProblemGE {
 
     public void generateCodeAndCompile(Solutions<Variable<Integer>> solutions) throws Exception {
         // Phenotype generation
-        ArrayList<String> phenotypes = new ArrayList<>();
+        String csvFilePath = "test" + File.separator + GramEvalStaticModel.class.getSimpleName() + ".csv";
+        ArrayList<String> phenotypes = new ArrayList<>(); 
+        int i=0;
         for (Solution<Variable<Integer>> solution : solutions) {
             Phenotype phenotype = super.generatePhenotype(solution);
             if (super.correctSol) {
@@ -85,15 +85,24 @@ public class GramEvalStaticModel extends AbstractProblemGE {
                 phenotypes.add("return 0;");
             }
         }
-        // Compilation process:
-        File file = new File(compiler.getWorkDir() + File.separator + "PopPredictor" + threadId + ".java");
+        if(flag==0){
+            File file1 = new File("test" + File.separator + "Main" + ".c");//NOMBRE FICHERO A SER CREADO
+            BufferedWriter writer1 = new BufferedWriter(new FileWriter(file1));
+            writer1.write(AbstractPopPredictor.generateClassMainC(threadId,phenotypes,dataTable.getPredictorColumn(),csvFilePath));
+            writer1.flush();
+            writer1.close();
+            file1 = new File("test" + File.separator + "PopPredictor" + threadId + ".h");//NOMBRE FICHERO A SER CREADO
+            writer1 = new BufferedWriter(new FileWriter(file1));
+            writer1.write(AbstractPopPredictor.generateUpdatePredictorHeaderC(phenotypes));
+            writer1.flush();
+            writer1.close();
+        }
+        File file = new File("test" + File.separator + "PopPredictor" + threadId + ".c");//NOMBRE FICHERO A SER CREADO
         BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-        writer.write(AbstractPopPredictor.generateClassCode(threadId, phenotypes));
+        writer.write(AbstractPopPredictor.generateUpdatePredictorC(phenotypes));
         writer.flush();
         writer.close();
-        LinkedList<String> filePaths = new LinkedList<>();
-        filePaths.add(file.getAbsolutePath());
-        boolean sucess = compiler.compile(filePaths);
+        boolean sucess = compiler.compileC(file.getAbsolutePath(),flag);
         if (!sucess) {
             LOGGER.severe("Unable to compile, with errors:");
             LOGGER.severe(compiler.getOutput());
@@ -103,29 +112,29 @@ public class GramEvalStaticModel extends AbstractProblemGE {
     @Override
     public void evaluate(Solutions<Variable<Integer>> solutions) {
         try {
-            this.generateCodeAndCompile(solutions);
-            // And now we evaluate all the solutions with the compiled file:
-            predictor = (AbstractPopPredictor) (new MyLoader(compiler.getWorkDir())).loadClass("PopPredictor" + threadId).newInstance();
-            for (int i = 0; i < solutions.size(); ++i) {
-                predictor.updatePredictor(dataTable, i);
-                //double fit = dataTable.computeFIT();
-                double fit = 0.0;
-                for(double[] row : dataTable.getData()) {
-                    if(row[0]!=row[dataTable.getPredictorColumn()]) {
-                        fit++;
-                    }
+            this.generateCodeAndCompile(solutions)
+            flag=1;
+            String fitPath = "test" + File.separator +"fitGESM.csv"; 
+            BufferedReader reader = new BufferedReader(new FileReader(new File(fitPath)));
+            String line;
+            int i=0;
+            while ((line = reader.readLine()) != null) {
+                if (line.isEmpty()) {
+                    continue;
                 }
-                if (fit < bestFitness) {
-                    bestFitness = fit;
-                    LOGGER.info("Best FIT=" + Math.round(100 * (1 - bestFitness)) + "%");
+            double fit= Double.valueOf(line);
+            if (fit < bestFitness) {
+                 bestFitness = fit;
+                 LOGGER.info("Best FIT=" + Math.round(100 * (1 - bestFitness)) + "%");
                 }
-                solutions.get(i).getObjectives().set(0, fit);
+             solutions.get(i).getObjectives().set(0, fit);
+             i++;
             }
+            reader.close();
         } catch (Exception ex) {
             Logger.getLogger(GramEvalStaticModel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
     @Override
     public void evaluate(Solution<Variable<Integer>> solution, Phenotype phenotype) {
         LOGGER.severe("The solutions should be already evaluated. You should not see this message.");
