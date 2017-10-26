@@ -1,6 +1,3 @@
-# Fórmula: SI(Y(V1>75,V2<25),0,1)
-# Solución encontrada usando FIT: if (((v[1]>75*Math.pow(10,+0))&&(v[2]<=27*Math.pow(10,-0)))) { result = 0.0; } else { result = 1.0; } return result; 
-# ... contando errores: if (((v[1]>=75*Math.pow(10,+0))&&(v[2]<=24*Math.pow(10,-0)))) { result = 0.0; } else { result = 1.0; } return result; 
 1;79.85;60.10
 1;8.68;65.99
 1;70.31;85.82
