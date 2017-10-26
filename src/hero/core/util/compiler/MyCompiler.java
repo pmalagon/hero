@@ -92,7 +92,44 @@ public class MyCompiler {
         fileManager.close();
         return success;
     }
-
+    public boolean compileC(String filePaths,int flag) throws Exception {
+        String s=null;
+        boolean success=true;
+        try {
+            if(flag==0){    
+                String comando1 ="gcc -c test/Main.c -o test/Main.o";
+                Process p1 = Runtime.getRuntime().exec(comando1);
+                BufferedReader stdInput1 = new BufferedReader(new InputStreamReader(p1.getInputStream()));
+              //BufferedReader stdError1 = new BufferedReader(new InputStreamReader(p1.getErrorStream()));
+                while ((s = stdInput1.readLine()) != null) {
+                }
+            //while ((s = stdError.readLine()) != null) {
+         //   System.out.println(s);
+            //  }}          
+            String comando ="gcc test/Main.o test/PopPredictor1.c -o test/Main";
+            Process p = Runtime.getRuntime().exec(comando);
+            BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+          //BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+            while ((s = stdInput.readLine()) != null) {
+            }  
+          //while ((s = stdError.readLine()) != null) {
+         //   System.out.println(s);
+            //  }
+            comando ="./test/Main";
+            p = Runtime.getRuntime().exec(comando);
+            stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+          //stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+            while ((s = stdInput.readLine()) != null) {
+            }
+          //while ((s = stdError.readLine()) != null) {
+         //   System.out.println(s);
+            //}
+        }catch(IOException e){
+           System.out.println("error");
+            success=false;
+        }
+        return success;
+    }
     public String getOutput() {
         return console.toString();
     }
