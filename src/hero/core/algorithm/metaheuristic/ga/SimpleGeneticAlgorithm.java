@@ -91,6 +91,12 @@ public class SimpleGeneticAlgorithm<V extends Variable<?>> extends Algorithm<V> 
                     break;
                 }
             }
+            File f = new File("/tmp/cnn.stop");
+            if(f.exists() ) { 
+                // do something
+                LOGGER.info("Stop file found: /tmp/cnn.stop. After " + currentGeneration + " generations.");
+                break;
+            }
         }
 
         return leaders;
