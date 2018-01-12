@@ -26,8 +26,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import hero.core.algorithm.Algorithm;
-import hero.core.algorithm.metaheuristic.moge.GrammaticalEvolution;
-import hero.core.algorithm.metaheuristic.moge.GrammaticalEvolution_example;
+import hero.core.algorithm.metaheuristic.ga.SimpleGeneticAlgorithm;
+import hero.core.operator.comparator.SimpleDominance;
+//import hero.core.operator.crossover.CycleCrossover;
+import hero.core.operator.crossover.SinglePointCrossover;
+import hero.core.operator.mutation.IntegerFlipMutation;
+import hero.core.operator.selection.BinaryTournament;
+import hero.core.problems.CNN_IDS;
+
 import hero.core.problem.Problem;
 import hero.core.problem.Solution;
 import hero.core.problem.Solutions;
@@ -65,11 +71,11 @@ public class MasterWorkerThreads<V extends Variable<?>> extends Problem<V> {
     public void evaluate(Solutions<V> solutions) {
         sharedQueue.addAll(solutions);
         LinkedList<Worker<V>> workers = new LinkedList<>();
-        int solutionsPerWorker = solutions.size()/numWorkers;
+        int solutionsPerWorker = solutions.size()/numWorkers + 1;
         int remainingSolutions = solutions.size()%numWorkers;
         for (int i = 0; i < numWorkers; ++i) {
-            if(i==(numWorkers-1)) {
-                solutionsPerWorker = solutionsPerWorker + remainingSolutions;
+            if (i==remainingSolutions) {
+                solutionsPerWorker--;
             }
             Worker<V> worker = new Worker<>(problemClones.get(i), sharedQueue, solutionsPerWorker);
             workers.add(worker);
@@ -111,16 +117,30 @@ public class MasterWorkerThreads<V extends Variable<?>> extends Problem<V> {
         HeroLogger.setup();
         long begin = System.currentTimeMillis();
         // First create the problem
-        GrammaticalEvolution_example problem = new GrammaticalEvolution_example("test/grammar_example.bnf");
+        CNN_IDS problem = new CNN_IDS(25, 23);
         // Second create the algorithm
-        GrammaticalEvolution algorithm = new GrammaticalEvolution(problem, 100, 250);
+	IntegerFlipMutation<Variable<Integer>> mutationOp = new IntegerFlipMutation<>(problem, 0.1);
+	//CycleCrossover<Variable<Integer>> crossoverOp = new CycleCrossover<>(0.5);
+        SinglePointCrossover<Variable<Integer>> crossoverOp = new SinglePointCrossover<>(problem);
+	SimpleDominance<Variable<Integer>> comparator = new SimpleDominance<>();
+	BinaryTournament<Variable<Integer>> selectionOp = new BinaryTournament<>(comparator);
+
+        SimpleGeneticAlgorithm<Variable<Integer>> ga = new SimpleGeneticAlgorithm<>(problem, 200, 20000, true, mutationOp, crossoverOp, selectionOp);
+        ga.initialize();
+
         // Now the master/worker
-        MasterWorkerThreads<Variable<Integer>> masterWorker = new MasterWorkerThreads<Variable<Integer>>(algorithm, problem, 4);
+        MasterWorkerThreads<Variable<Integer>> masterWorker = new MasterWorkerThreads<Variable<Integer>>(ga, problem, problem.getIpsAvailable());
         Solutions<Variable<Integer>> solutions = masterWorker.execute();
-        for (Solution<Variable<Integer>> solution : solutions) {
-            logger.info("Fitness = (" + solution.getObjectives().get(0) + ", " + solution.getObjectives().get(1) + ")");
-            logger.info("Phenotype = (" + problem.generatePhenotype(solution).toString() + ")");
+	for(Solution<Variable<Integer>> solution : solutions) {
+	    System.out.print("Solution = ");
+            for (int i = 0; i < problem.getNumberOfVariables(); ++i) {
+                double xi = solution.getVariables().get(i).getValue();
+                System.out.print(xi+",");
+            }
+            System.out.println("");
+            System.out.println("Fitness = " + solution.getObjectives().get(0));
         }
+
         long end = System.currentTimeMillis();
         logger.info("Time: " + ((end - begin) / 1000.0) + " seconds");
     }

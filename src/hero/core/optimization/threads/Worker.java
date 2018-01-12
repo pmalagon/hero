@@ -48,20 +48,14 @@ public class Worker<V extends Variable<?>> extends Thread {
 
     @Override
     public void run() {
-        Solutions<V> solutions = new Solutions<>();
         try {
-            for (int i = 0; i < numSolutions; ++i) {
-                Solution<V> solution = sharedQueue.poll(3, TimeUnit.SECONDS);
-                if (solution != null) {
-                    solutions.add(solution);
-                }
+            Solution<V> solution = sharedQueue.poll(3, TimeUnit.SECONDS);
+            while (solution != null) {
+                problem.evaluate(solution);
             }
-            problem.evaluate(solutions);
-            solutions.clear();
         } catch (InterruptedException e) {
             logger.severe(e.getLocalizedMessage());
             logger.severe("Thread " + super.getId() + " has been interrupted. Shuting down ...");
         }
-
     }
 }
