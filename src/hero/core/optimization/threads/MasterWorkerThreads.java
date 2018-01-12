@@ -29,7 +29,8 @@ import hero.core.algorithm.Algorithm;
 import hero.core.algorithm.metaheuristic.ga.SimpleGeneticAlgorithm;
 import hero.core.operator.comparator.SimpleDominance;
 //import hero.core.operator.crossover.CycleCrossover;
-import hero.core.operator.crossover.SinglePointCrossover;
+//import hero.core.operator.crossover.SinglePointCrossover;
+import hero.core.operator.crossover.RegionCrossover;
 import hero.core.operator.mutation.IntegerFlipMutation;
 import hero.core.operator.selection.BinaryTournament;
 import hero.core.problems.CNN_IDS;
@@ -121,11 +122,12 @@ public class MasterWorkerThreads<V extends Variable<?>> extends Problem<V> {
         // Second create the algorithm
 	IntegerFlipMutation<Variable<Integer>> mutationOp = new IntegerFlipMutation<>(problem, 0.1);
 	//CycleCrossover<Variable<Integer>> crossoverOp = new CycleCrossover<>(0.5);
-        SinglePointCrossover<Variable<Integer>> crossoverOp = new SinglePointCrossover<>(problem);
+        //SinglePointCrossover<Variable<Integer>> crossoverOp = new SinglePointCrossover<>(problem);
+        RegionCrossover<Variable<Integer>> crossoverOp = new RegionCrossover<>(problem);
 	SimpleDominance<Variable<Integer>> comparator = new SimpleDominance<>();
 	BinaryTournament<Variable<Integer>> selectionOp = new BinaryTournament<>(comparator);
 
-        SimpleGeneticAlgorithm<Variable<Integer>> ga = new SimpleGeneticAlgorithm<>(problem, 200, 20000, true, mutationOp, crossoverOp, selectionOp);
+        SimpleGeneticAlgorithm<Variable<Integer>> ga = new SimpleGeneticAlgorithm<>(problem, 200, 1000, true, mutationOp, crossoverOp, selectionOp);
         ga.initialize();
 
         // Now the master/worker
