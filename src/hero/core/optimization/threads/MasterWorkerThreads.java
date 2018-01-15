@@ -31,7 +31,8 @@ import hero.core.operator.comparator.SimpleDominance;
 //import hero.core.operator.crossover.CycleCrossover;
 //import hero.core.operator.crossover.SinglePointCrossover;
 import hero.core.operator.crossover.RegionCrossover;
-import hero.core.operator.mutation.IntegerFlipMutation;
+//import hero.core.operator.mutation.IntegerFlipMutation;
+import hero.core.operator.mutation.SwapMutation;
 import hero.core.operator.selection.BinaryTournament;
 import hero.core.problems.CNN_IDS;
 
@@ -120,7 +121,8 @@ public class MasterWorkerThreads<V extends Variable<?>> extends Problem<V> {
         // First create the problem
         CNN_IDS problem = new CNN_IDS(25, 23);
         // Second create the algorithm
-	IntegerFlipMutation<Variable<Integer>> mutationOp = new IntegerFlipMutation<>(problem, 0.1);
+	//IntegerFlipMutation<Variable<Integer>> mutationOp = new IntegerFlipMutation<>(problem, 0.1);
+	SwapMutation<Variable<Integer>> mutationOp = new SwapMutation<>(0.1);
 	//CycleCrossover<Variable<Integer>> crossoverOp = new CycleCrossover<>(0.5);
         //SinglePointCrossover<Variable<Integer>> crossoverOp = new SinglePointCrossover<>(problem);
         RegionCrossover<Variable<Integer>> crossoverOp = new RegionCrossover<>(problem);
