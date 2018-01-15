@@ -27,10 +27,24 @@ import hero.core.util.random.RandomGenerator;
 
 public class RegionCrossover<T extends Variable<?>> extends CrossoverOperator<T> {
 
+    public static final int DEFAULT_SOL_SIZEX = 5;
+    public static final int DEFAULT_SOL_SIZEY = 5;
+    public static final int DEFAULT_REGION_SIZE = 3;
+
     protected Problem<T> problem;
+    protected int sizeX;
+    protected int sizeY;
+    protected int regionSize;
+
+    public RegionCrossover(Problem<T> problem, int sizeX, int sizeY, int regionSize) {
+        this.problem = problem;
+        this.sizeX = sizeX;
+        this.sizeY = sizeY;
+        this.regionSize = regionSize;
+    }  // RegionCrossover
 
     public RegionCrossover(Problem<T> problem) {
-        this.problem = problem;
+        this(problem, DEFAULT_SOL_SIZEX, DEFAULT_SOL_SIZEY, DEFAULT_REGION_SIZE); 
     }  // RegionCrossover
 
     /**
@@ -41,8 +55,10 @@ public class RegionCrossover<T extends Variable<?>> extends CrossoverOperator<T>
      *
      */
     private void makeNewSolution(Solution<T> sol1, Solution<T> sol2) {
-        int px = RandomGenerator.nextInt(3);
-        int py = RandomGenerator.nextInt(3);
+        int px = RandomGenerator.nextInt(sizeX-regionSize+1);
+        int px2 = px + regionSize-1;
+        int py = RandomGenerator.nextInt(sizeY-regionSize+1);
+        int py2 = py + regionSize-1;
 
         ArrayList<T> fix1 = new ArrayList<>();
         ArrayList<T> nofix1 = new ArrayList<>();
@@ -53,10 +69,10 @@ public class RegionCrossover<T extends Variable<?>> extends CrossoverOperator<T>
         Solution<T> tmp1 = sol1.clone();
         Solution<T> tmp2 = sol2.clone();
 
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
-                int index = 5*i + j;
-                if ((i < px) || (i > px+2) || (j < py) || (j > py)) {
+        for (int i = 0; i < sizeX; i++) {
+            for (int j = 0; j < sizeY; j++) {
+                int index = sizeY*i + j;
+                if ((i < px) || (i > px2) || (j < py) || (j > py2)) {
                     nofix1.add(sol1.getVariables().get(index));
                     common.add(sol1.getVariables().get(index));
                     nofix2.add(sol2.getVariables().get(index));
@@ -74,10 +90,10 @@ public class RegionCrossover<T extends Variable<?>> extends CrossoverOperator<T>
             
         int f1 = 0;
         int f2 = 0;
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
-                int index = 5*i + j;
-                if ((i < px) || (i > px+2) || (j < py) || (j > py)) {
+        for (int i = 0; i < sizeX; i++) {
+            for (int j = 0; j < sizeY; j++) {
+                int index = sizeY*i + j;
+                if ((i < px) || (i > px2) || (j < py) || (j > py2)) {
                     Variable<Integer> v1 = sol2.getVariables().get(index);
                     if (fix1.contains(v1) && nofix1.size() ) {
                         sol1.getVariables().set(index, nofix1.get(f1));
@@ -86,7 +102,7 @@ public class RegionCrossover<T extends Variable<?>> extends CrossoverOperator<T>
                         sol1.getVariables().set(index, v1);
                     }
                     Variable<Integer> v2 = sol1.getVariables().get(index);
-                    if (fix2.contains(v2) ) {
+                    if (fix2.contains(v2) && nofix2.size() ) {
                         sol2.getVariables().set(index, nofix2.get(f2));
                         f2 = (f2++)%nofix2.size();
                     } else {
