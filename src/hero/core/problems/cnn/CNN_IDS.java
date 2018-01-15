@@ -18,9 +18,10 @@
  *  - José Luis Risco Martín
  *  - Pedro Malagón
  */
-package hero.core.problems;
+package hero.core.problems.cnn;
 
 import java.util.logging.Logger;
+import java.util.socket.SocketManager;
 
 import java.util.ArrayList;
 
@@ -42,6 +43,7 @@ public class CNN_IDS extends Problem<Variable<Integer>> {
     protected int id = 0;
     protected String ip;
     protected Integer numberOfFeatures;
+    protected SocketManager sm;
     protected double bestValue = Double.POSITIVE_INFINITY;
 
     public CNN_IDS(Integer numberOfVariables, Integer numberOfFeatures) {
@@ -53,6 +55,8 @@ public class CNN_IDS extends Problem<Variable<Integer>> {
         }
         this.id = lastid % ips.length();
         this.ip = ips[this.id];
+ 
+        this.sm = new SocketManager(this.ip, port);
         lastid++;
     }
 
@@ -108,26 +112,22 @@ public class CNN_IDS extends Problem<Variable<Integer>> {
     public void evaluate(Solution<Variable<Integer>> solution) {
         int flags = 0;
         int factor = 1;
-        for (int i = 0; i < numberOfVariables; ++i) {
-            int xi = solution.getVariables().get(i).getValue();
-            flags = flags | (1 << xi);
-        }
-        if (flags != 0x007FFFFF) {
-            factor = 2;
-        } 
+        //for (int i = 0; i < numberOfVariables; ++i) {
+        //    int xi = solution.getVariables().get(i).getValue();
+        //    flags = flags | (1 << xi);
+        //}
+        //if (flags != 0x007FFFFF) {
+        //    factor = 2;
+        //} 
  
         //Call CNN evaluation function in Python instead of this
         //IP: ip, PORT: port
-       double fitness = 0;
-        for (int i = 0; i < numberOfVariables; ++i) {
-            int xi = syyolution.getVariables().get(i).getValue();
-            fitness += Math.pow((xi-i), 2);
-        }
+	double val = sm.sendSyncOrder(solution.getVariables());
+        double fitness = (1-val)*factor;
 
-        //Replace until here
-        solution.getObjectives().set(0, fitness * 2);
+        solution.getObjectives().set(0, fitness);
         if (fitness < bestValue) {
-            logger.info("Best value found: " + fitness);
+            logger.info("Best value found: " + fitness + " with factor " + factor);
             bestValue = fitness;
         }
     }

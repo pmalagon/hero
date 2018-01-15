@@ -34,7 +34,7 @@ import hero.core.operator.crossover.RegionCrossover;
 //import hero.core.operator.mutation.IntegerFlipMutation;
 import hero.core.operator.mutation.SwapMutation;
 import hero.core.operator.selection.BinaryTournament;
-import hero.core.problems.CNN_IDS;
+import hero.core.problems.cnn.CNN_IDS;
 
 import hero.core.problem.Problem;
 import hero.core.problem.Solution;
