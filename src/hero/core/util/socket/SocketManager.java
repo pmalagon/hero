@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.ArrayList;
+import hero.core.problem.Variable;
 
 public class SocketManager {
 
@@ -36,13 +37,13 @@ public class SocketManager {
         this.serverPort = serverPort;
     }
 
-    public float sendSyncOrder(ArrayList<Integer> order){
+    public float sendSyncOrder(ArrayList<Variable<Integer>> order){
         if (this.serverIP.equals("") || this.serverPort == 0){
             System.out.println("ERROR: IP AND PORT NEEDED");
-            return;
+            return -1;
         }
 
-	float val = -1.0;
+	float val = -1;
         try {
             Socket socket = new Socket(serverIP, serverPort);
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -63,11 +64,11 @@ public class SocketManager {
         return val;
     }
 
-    private String parseArrayList(ArrayList<Integer> arrayList){
+    private String parseArrayList(ArrayList<Variable<Integer>> arrayList){
 
         StringBuilder stringListBuilder = new StringBuilder();
-        for (Integer item : arrayList) {
-            stringListBuilder.append(item).append("-");
+        for (Variable item : arrayList) {
+            stringListBuilder.append(item.getValue()).append("-");
         }
 
         String stringList = stringListBuilder.toString();

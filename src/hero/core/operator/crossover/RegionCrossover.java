@@ -19,6 +19,8 @@
  */
 package hero.core.operator.crossover;
 
+import java.util.Collections;
+import java.util.ArrayList;
 import hero.core.problem.Problem;
 import hero.core.problem.Solution;
 import hero.core.problem.Solutions;
@@ -72,7 +74,7 @@ public class RegionCrossover<T extends Variable<?>> extends CrossoverOperator<T>
         for (int i = 0; i < sizeX; i++) {
             for (int j = 0; j < sizeY; j++) {
                 int index = sizeY*i + j;
-                if ((i < px) || (i > px2) || (j < py) || (j > py2)) {
+                if ((i < px)||(i > px2)||(j < py)||(j > py2)) {
                     nofix1.add(sol1.getVariables().get(index));
                     common.add(sol1.getVariables().get(index));
                     nofix2.add(sol2.getVariables().get(index));
@@ -93,16 +95,16 @@ public class RegionCrossover<T extends Variable<?>> extends CrossoverOperator<T>
         for (int i = 0; i < sizeX; i++) {
             for (int j = 0; j < sizeY; j++) {
                 int index = sizeY*i + j;
-                if ((i < px) || (i > px2) || (j < py) || (j > py2)) {
-                    Variable<Integer> v1 = sol2.getVariables().get(index);
-                    if (fix1.contains(v1) && nofix1.size() ) {
+                if ((i < px)||(i > px2)||(j < py)||(j > py2)) {
+                    T v1 = sol2.getVariables().get(index);
+                    if (fix1.contains(v1) && (nofix1.size()!=0) ) {
                         sol1.getVariables().set(index, nofix1.get(f1));
                         f1 = (f1++)%nofix1.size();
                     } else {
                         sol1.getVariables().set(index, v1);
                     }
-                    Variable<Integer> v2 = sol1.getVariables().get(index);
-                    if (fix2.contains(v2) && nofix2.size() ) {
+                    T v2 = sol1.getVariables().get(index);
+                    if (fix2.contains(v2) && (nofix2.size()!=0) ) {
                         sol2.getVariables().set(index, nofix2.get(f2));
                         f2 = (f2++)%nofix2.size();
                     } else {

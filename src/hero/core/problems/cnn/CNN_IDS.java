@@ -21,7 +21,6 @@
 package hero.core.problems.cnn;
 
 import java.util.logging.Logger;
-import java.util.socket.SocketManager;
 
 import java.util.ArrayList;
 
@@ -30,12 +29,14 @@ import hero.core.problem.Solution;
 import hero.core.problem.Solutions;
 import hero.core.problem.Variable;
 import hero.core.util.random.RandomGenerator;
+import hero.core.util.socket.SocketManager;
 import java.util.Collections;
 
 public class CNN_IDS extends Problem<Variable<Integer>> {
 
-    private static String[] ips = {"kylo.lsi.die", "milo.lsi.die", "floyd.lsi.die"};
-    private static final int port = 22222;
+    //private static String[] ips = {"kylo.lsi.die", "milo.lsi.die", "floyd.lsi.die"};
+    private static String[] ips = {"localhost"};
+    private static final int port = 8888;
 
     private static final Logger logger = Logger.getLogger(CNN_IDS.class.getName());
     protected static int lastid = 0;
@@ -53,7 +54,7 @@ public class CNN_IDS extends Problem<Variable<Integer>> {
             lowerBound[i] = 0;
             upperBound[i] = numberOfFeatures-1;
         }
-        this.id = lastid % ips.length();
+        this.id = lastid % ips.length;
         this.ip = ips[this.id];
  
         this.sm = new SocketManager(this.ip, port);
@@ -98,7 +99,7 @@ public class CNN_IDS extends Problem<Variable<Integer>> {
     }
 
     public int getIpsAvailable() {
-        return ips.length();
+        return ips.length;
     }
 
     @Override

@@ -129,7 +129,7 @@ public class MasterWorkerThreads<V extends Variable<?>> extends Problem<V> {
 	SimpleDominance<Variable<Integer>> comparator = new SimpleDominance<>();
 	BinaryTournament<Variable<Integer>> selectionOp = new BinaryTournament<>(comparator);
 
-        SimpleGeneticAlgorithm<Variable<Integer>> ga = new SimpleGeneticAlgorithm<>(problem, 200, 1000, true, mutationOp, crossoverOp, selectionOp);
+        SimpleGeneticAlgorithm<Variable<Integer>> ga = new SimpleGeneticAlgorithm<>(problem, 4, 4, true, mutationOp, crossoverOp, selectionOp);
         ga.initialize();
 
         // Now the master/worker

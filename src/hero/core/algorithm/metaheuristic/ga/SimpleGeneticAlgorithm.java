@@ -20,6 +20,7 @@
 package hero.core.algorithm.metaheuristic.ga;
 
 import java.util.Collections;
+import java.io.File;
 import java.util.logging.Logger;
 import hero.core.algorithm.Algorithm;
 import hero.core.operator.comparator.SimpleDominance;
