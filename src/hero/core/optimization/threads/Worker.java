@@ -49,8 +49,11 @@ public class Worker<V extends Variable<?>> extends Thread {
     @Override
     public void run() {
         try {
+            int sol = 0;
             Solution<V> solution = sharedQueue.poll(3, TimeUnit.SECONDS);
             while (solution != null) {
+                logger.info("Evaluate " + sol);
+                sol++;
                 problem.evaluate(solution);
             }
         } catch (InterruptedException e) {

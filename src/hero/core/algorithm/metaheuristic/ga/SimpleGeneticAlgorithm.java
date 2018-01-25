@@ -77,14 +77,14 @@ public class SimpleGeneticAlgorithm<V extends Variable<?>> extends Algorithm<V> 
 
     @Override
     public Solutions<V> execute() {
-        int nextPercentageReport = 10;
+        int nextPercentageReport = 5;
         while (currentGeneration < maxGenerations) {
             step();
             int percentage = Math.round((currentGeneration * 100) / maxGenerations);
             Double bestObj = leaders.get(0).getObjectives().get(0);
-            if (percentage == nextPercentageReport) {
+            if (percentage >= nextPercentageReport) {
                 LOGGER.info(percentage + "% performed ..." + " -- Best fitness: " + bestObj);
-                nextPercentageReport += 10;
+                nextPercentageReport += 5;
             }
             if (stopWhenSolved) {
                 if (bestObj <= 0) {
@@ -106,6 +106,7 @@ public class SimpleGeneticAlgorithm<V extends Variable<?>> extends Algorithm<V> 
     @Override
     public void step() {
         currentGeneration++;
+        LOGGER.info("New generation: " + currentGeneration);
         // Create the offSpring solutionSet        
         Solutions<V> childPop = new Solutions<>();
         Solution<V> parent1, parent2;
@@ -127,6 +128,7 @@ public class SimpleGeneticAlgorithm<V extends Variable<?>> extends Algorithm<V> 
             leaders.add(clone);
         }
         reduceLeaders();
+        printLeaders();
     }
 
     public void reduceLeaders() {
@@ -153,6 +155,19 @@ public class SimpleGeneticAlgorithm<V extends Variable<?>> extends Algorithm<V> 
         }
     }
 
+    public void printLeaders() {
+        for(Solution<V> solution : leaders) {
+            System.out.print("Solution = ");
+            for (int i = 0; i < problem.getNumberOfVariables(); ++i) {
+                Object xi = solution.getVariables().get(i).getValue();
+                System.out.print(xi+",");
+            }
+            System.out.println("");
+            System.out.println("Fitness = " + solution.getObjectives().get(0));
+        }
+    }
+
+    
     public Solutions<V> getSolutions() {
         return population;
     }
