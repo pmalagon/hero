@@ -36,7 +36,7 @@ public class CNN_IDS extends Problem<Variable<Integer>> {
 
     //private static String[] ips = {"kylo.lsi.die", "milo.lsi.die", "floyd.lsi.die"};
     private static String[] ips = {"localhost"};
-    private static final int port = 8091;
+    private static int port = 8091;
 
     private static final Logger logger = Logger.getLogger(CNN_IDS.class.getName());
     protected static int lastid = 0;
@@ -48,9 +48,10 @@ public class CNN_IDS extends Problem<Variable<Integer>> {
     protected double bestValue = Double.POSITIVE_INFINITY;
     protected int sol;
 
-    public CNN_IDS(Integer numberOfVariables, Integer numberOfFeatures) {
+    public CNN_IDS(int port, Integer numberOfVariables, Integer numberOfFeatures) {
         super(numberOfVariables, 1);
         this.numberOfFeatures = numberOfFeatures;
+        this.port = port;
         for (int i = 0; i < numberOfVariables; i++) {
             lowerBound[i] = 0;
             upperBound[i] = numberOfFeatures-1;

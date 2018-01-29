@@ -38,6 +38,7 @@ public class SimpleGeneticAlgorithm<V extends Variable<?>> extends Algorithm<V> 
 
     /////////////////////////////////////////////////////////////////////////
     protected Boolean stopWhenSolved = null;
+    protected String  stopFilePath = null;
     protected Integer maxGenerations = null;
     protected Integer maxPopulationSize = null;
     protected Integer currentGeneration = null;
@@ -49,7 +50,7 @@ public class SimpleGeneticAlgorithm<V extends Variable<?>> extends Algorithm<V> 
     protected CrossoverOperator<V> crossoverOperator;
     protected SelectionOperator<V> selectionOperator;
 
-    public SimpleGeneticAlgorithm(Problem<V> problem, Integer maxPopulationSize, Integer maxGenerations, Boolean stopWhenSolved, MutationOperator<V> mutationOperator, CrossoverOperator<V> crossoverOperator, SelectionOperator<V> selectionOperator) {
+    public SimpleGeneticAlgorithm(Problem<V> problem, Integer maxPopulationSize, Integer maxGenerations, Boolean stopWhenSolved, MutationOperator<V> mutationOperator, CrossoverOperator<V> crossoverOperator, SelectionOperator<V> selectionOperatori, String stopFilePath) {
         super(problem);
         this.maxGenerations = maxGenerations;
         this.maxPopulationSize = maxPopulationSize;
@@ -57,6 +58,7 @@ public class SimpleGeneticAlgorithm<V extends Variable<?>> extends Algorithm<V> 
         this.mutationOperator = mutationOperator;
         this.crossoverOperator = crossoverOperator;
         this.selectionOperator = selectionOperator;
+        this.stopFilePath = stopFilePath;
     }
 
     @Override
@@ -92,10 +94,10 @@ public class SimpleGeneticAlgorithm<V extends Variable<?>> extends Algorithm<V> 
                     break;
                 }
             }
-            File f = new File("/tmp/cnn.stop");
+            File f = new File(stopFilePath);
             if(f.exists() ) { 
                 // do something
-                LOGGER.info("Stop file found: /tmp/cnn.stop. After " + currentGeneration + " generations.");
+                LOGGER.info("Stop file found: " + stopFilePath + ". After " + currentGeneration + " generations.");
                 break;
             }
         }

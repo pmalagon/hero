@@ -39,10 +39,12 @@ public class SimpleGeneticAlgorithm_example {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		HeroLogger.setup(Level.FINE);
+		//HeroLogger.setup("random_mc_nonorm.log", Level.FINE);
+                HeroLogger.setup(args[0], Level.FINE);
                 Logger logger = Logger.getLogger("");
+                int port = Integer.parseInt(args[1]);
 		// First create the problem
-                CNN_IDS problem = new CNN_IDS(25, 23);
+                CNN_IDS problem = new CNN_IDS(port, 25, 23);
 		// Second create the algorithm
 		//SwapMutation<Variable<Integer>> mutationOp = new SwapMutation<>(0.1);
                 IntegerFlipMutation mutationOp = new IntegerFlipMutation<>(problem, 0.1);
@@ -50,7 +52,7 @@ public class SimpleGeneticAlgorithm_example {
                 SinglePointCrossover<Variable<Integer>> crossoverOp = new SinglePointCrossover<>(problem);
 		SimpleDominance<Variable<Integer>> comparator = new SimpleDominance<>();
                 BinaryTournament<Variable<Integer>> selectionOp = new BinaryTournament<>(comparator);
-		SimpleGeneticAlgorithm<Variable<Integer>> ga = new SimpleGeneticAlgorithm<>(problem, 1000, 2000, true, mutationOp, crossoverOp, selectionOp);
+		SimpleGeneticAlgorithm<Variable<Integer>> ga = new SimpleGeneticAlgorithm<>(problem, 1000, 2000, true, mutationOp, crossoverOp, selectionOp, "/tmp/"+args[0]+".stop");
                 ga.initialize();
 
                 long begin = System.currentTimeMillis();
