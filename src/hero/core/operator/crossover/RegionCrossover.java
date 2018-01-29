@@ -99,14 +99,14 @@ public class RegionCrossover<T extends Variable<?>> extends CrossoverOperator<T>
                     T v1 = sol2.getVariables().get(index);
                     if (fix1.contains(v1) && (nofix1.size()!=0) ) {
                         sol1.getVariables().set(index, nofix1.get(f1));
-                        f1 = (f1++)%nofix1.size();
+                        f1 = (f1+1)%nofix1.size();
                     } else {
                         sol1.getVariables().set(index, v1);
                     }
                     T v2 = sol1.getVariables().get(index);
                     if (fix2.contains(v2) && (nofix2.size()!=0) ) {
                         sol2.getVariables().set(index, nofix2.get(f2));
-                        f2 = (f2++)%nofix2.size();
+                        f2 = (f2+1)%nofix2.size();
                     } else {
                         sol2.getVariables().set(index, v2);
                     }
