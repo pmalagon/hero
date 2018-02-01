@@ -21,9 +21,11 @@ package hero.core.algorithm.metaheuristic.ga;
 
 import java.util.logging.Level;
 import hero.core.operator.comparator.SimpleDominance;
+import hero.core.operator.crossover.CrossoverOperator;
 import hero.core.operator.crossover.RegionCrossover;
 import hero.core.operator.crossover.SinglePointCrossover;
 import hero.core.operator.mutation.IntegerFlipMutation;
+import hero.core.operator.mutation.MutationOperator;
 import hero.core.operator.mutation.SwapMutation;
 import hero.core.operator.selection.BinaryTournament;
 import hero.core.problem.Solution;
@@ -43,16 +45,26 @@ public class SimpleGeneticAlgorithm_example {
                 HeroLogger.setup(args[0], Level.FINE);
                 Logger logger = Logger.getLogger("");
                 int port = Integer.parseInt(args[1]);
-		// First create the problem
-                CNN_IDS problem = new CNN_IDS(port, 25, 23);
-		// Second create the algorithm
-		//SwapMutation<Variable<Integer>> mutationOp = new SwapMutation<>(0.1);
-                IntegerFlipMutation mutationOp = new IntegerFlipMutation<>(problem, 0.1);
-		//RegionCrossover<Variable<Integer>> crossoverOp = new RegionCrossover<>(problem);
-                SinglePointCrossover<Variable<Integer>> crossoverOp = new SinglePointCrossover<>(problem);
-		SimpleDominance<Variable<Integer>> comparator = new SimpleDominance<>();
+                int mode = Integer.parseInt(args[2]);
+
+                // First create the problem
+                CNN_IDS problem = new CNN_IDS(port, mode, 25, 23);
+
+                // Second create the algorithm
+                MutationOperator<Variable<Integer>> mutationOp;
+                CrossoverOperator<Variable<Integer>> crossoverOp;
+
+                if (mode == 1){
+                    mutationOp = new SwapMutation<>(0.1);
+                    crossoverOp = new RegionCrossover<>(problem);
+                } else {
+                    mutationOp = new IntegerFlipMutation<>(problem, 0.1);
+                    crossoverOp = new SinglePointCrossover<>(problem);
+                }
+
+        		SimpleDominance<Variable<Integer>> comparator = new SimpleDominance<>();
                 BinaryTournament<Variable<Integer>> selectionOp = new BinaryTournament<>(comparator);
-		SimpleGeneticAlgorithm<Variable<Integer>> ga = new SimpleGeneticAlgorithm<>(problem, 1000, 2000, true, mutationOp, crossoverOp, selectionOp, "/tmp/"+args[0]+".stop");
+		        SimpleGeneticAlgorithm<Variable<Integer>> ga = new SimpleGeneticAlgorithm<>(problem, 1000, 2000, true, mutationOp, crossoverOp, selectionOp, "/tmp/"+args[0]+".stop");
                 ga.initialize();
 
                 long begin = System.currentTimeMillis();

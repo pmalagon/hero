@@ -37,6 +37,7 @@ public class CNN_IDS extends Problem<Variable<Integer>> {
     //private static String[] ips = {"kylo.lsi.die", "milo.lsi.die", "floyd.lsi.die"};
     private static String[] ips = {"localhost"};
     private static int port = 8091;
+    private static int mode = 0;
 
     private static final Logger logger = Logger.getLogger(CNN_IDS.class.getName());
     protected static int lastid = 0;
@@ -48,10 +49,11 @@ public class CNN_IDS extends Problem<Variable<Integer>> {
     protected double bestValue = Double.POSITIVE_INFINITY;
     protected int sol;
 
-    public CNN_IDS(int port, Integer numberOfVariables, Integer numberOfFeatures) {
+    public CNN_IDS(int port, int mode, Integer numberOfVariables, Integer numberOfFeatures) {
         super(numberOfVariables, 1);
         this.numberOfFeatures = numberOfFeatures;
         this.port = port;
+        this.mode = mode;
         for (int i = 0; i < numberOfVariables; i++) {
             lowerBound[i] = 0;
             upperBound[i] = numberOfFeatures-1;
@@ -64,50 +66,55 @@ public class CNN_IDS extends Problem<Variable<Integer>> {
     }
 
     public Solutions<Variable<Integer>> newRandomSetOfSolutions(int size) {
+
         Solutions<Variable<Integer>> solutions = new Solutions<Variable<Integer>>();
 
-        for (int i = 0; i < size; ++i) {
-            Solution<Variable<Integer>> solI = new Solution<Variable<Integer>>(numberOfObjectives);
-            for (int j = 0; j < numberOfVariables; ++j) {
-                Variable<Integer> v = new Variable(RandomGenerator.nextInt(numberOfFeatures));
-                solI.getVariables().add(v);
-            }
-            solutions.add(solI);
-        }
+        if (mode == 1) {
 
-//        Solutions<Variable<Integer>> solutions = new Solutions<Variable<Integer>>();
-//        ArrayList<Variable<Integer>> features1 = new ArrayList<Variable<Integer>>();
-//        ArrayList<Variable<Integer>> features_extra = new ArrayList<Variable<Integer>>();
-//        
-//        for (int j = 0; j < numberOfFeatures; ++j) {
-//            features1.add(new Variable<Integer>(j));
-//            features_extra.add(new Variable<Integer>(j));
-//            features_extra.add(new Variable<Integer>(j));
-//        }
-//        
-//        ArrayList<Variable<Integer>> features = new ArrayList<Variable<Integer>>();
-//        features.addAll(features1);
-//        int v;
-//        for (v = numberOfFeatures; v < numberOfVariables; ++v) {
-//            features.add(features_extra.get(v-numberOfFeatures));
-//        }
-//
-//        for (int i = 0; i < size; ++i) {
-//            for (v = 0; v < numberOfFeatures; ++v) {
-//                features.set(v, features1.get(v));
-//            }
-//            Collections.shuffle(features_extra);
-//            for (; v < numberOfVariables; ++v) {
-//                features.set(v, features_extra.get(v-numberOfFeatures));
-//            }
-//            Collections.shuffle(features);
-//            
-//            Solution<Variable<Integer>> solI = new Solution<Variable<Integer>>(numberOfObjectives);
-//            for (int j = 0; j < numberOfVariables; ++j) {
-//                solI.getVariables().add(features.get(j));
-//            }
-//            solutions.add(solI);
-//        }
+            ArrayList<Variable<Integer>> features1 = new ArrayList<Variable<Integer>>();
+            ArrayList<Variable<Integer>> features_extra = new ArrayList<Variable<Integer>>();
+            
+            for (int j = 0; j < numberOfFeatures; ++j) {
+                features1.add(new Variable<Integer>(j));
+                features_extra.add(new Variable<Integer>(j));
+                features_extra.add(new Variable<Integer>(j));
+            }
+            
+            ArrayList<Variable<Integer>> features = new ArrayList<Variable<Integer>>();
+            features.addAll(features1);
+            int v;
+            for (v = numberOfFeatures; v < numberOfVariables; ++v) {
+                features.add(features_extra.get(v-numberOfFeatures));
+            }
+
+            for (int i = 0; i < size; ++i) {
+                for (v = 0; v < numberOfFeatures; ++v) {
+                    features.set(v, features1.get(v));
+                }
+                Collections.shuffle(features_extra);
+                for (; v < numberOfVariables; ++v) {
+                    features.set(v, features_extra.get(v-numberOfFeatures));
+                }
+                Collections.shuffle(features);
+                
+                Solution<Variable<Integer>> solI = new Solution<Variable<Integer>>(numberOfObjectives);
+                for (int j = 0; j < numberOfVariables; ++j) {
+                    solI.getVariables().add(features.get(j));
+                }
+                solutions.add(solI);
+            }
+
+        } else {
+            for (int i = 0; i < size; ++i) {
+                Solution<Variable<Integer>> solI = new Solution<Variable<Integer>>(numberOfObjectives);
+                for (int j = 0; j < numberOfVariables; ++j) {
+                    Variable<Integer> v = new Variable(RandomGenerator.nextInt(numberOfFeatures));
+                    solI.getVariables().add(v);
+                }
+                solutions.add(solI);
+            }
+        } 
+
         return solutions;
     }
 

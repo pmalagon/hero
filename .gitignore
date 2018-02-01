@@ -10,3 +10,6 @@ manifest.mf
 *.log
 *.log.*
 
+# Idea files
+.idea/
+*iml
