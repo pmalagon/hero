@@ -65,7 +65,24 @@ public class SimpleGeneticAlgorithm_example {
         		SimpleDominance<Variable<Integer>> comparator = new SimpleDominance<>();
                 BinaryTournament<Variable<Integer>> selectionOp = new BinaryTournament<>(comparator);
 		        SimpleGeneticAlgorithm<Variable<Integer>> ga = new SimpleGeneticAlgorithm<>(problem, 1000, 2000, true, mutationOp, crossoverOp, selectionOp, "/tmp/"+args[0]+".stop");
-                ga.initialize();
+		if (args.length > 3) {
+			Solutions<Variable<Integer>> solutions = new Solutions<Variable<Integer>>(); 
+			//Parse solutions from file
+			BufferedReader br = new BufferedReader(new FileReader("thefile.csv"));
+			String line = null;
+			while ((line = br.readLine()) != null) {
+				Solution<Variable<Integer>> solI = new Solution<Variable<Integer>>(numberOfObjectives);
+				String[] values = line.split(",");
+				for (String str : values) {
+					solI.getVariables().add(newVariable<Integer>(Integer.parseInt(str)));
+				}
+				solutions.add(solI);
+			}
+			br.close();
+			ga.initilize(solutions);
+		} else {
+                	ga.initialize();
+		}
 
                 long begin = System.currentTimeMillis();
                 
