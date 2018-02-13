@@ -119,7 +119,7 @@ public class MasterWorkerThreads<V extends Variable<?>> extends Problem<V> {
         HeroLogger.setup();
         long begin = System.currentTimeMillis();
         // First create the problem
-        CNN_IDS problem = new CNN_IDS(25, 23);
+        CNN_IDS problem = new CNN_IDS(8080, 1, 25, 23);
         // Second create the algorithm
 	//IntegerFlipMutation<Variable<Integer>> mutationOp = new IntegerFlipMutation<>(problem, 0.1);
 	SwapMutation<Variable<Integer>> mutationOp = new SwapMutation<>(0.1);
@@ -129,7 +129,7 @@ public class MasterWorkerThreads<V extends Variable<?>> extends Problem<V> {
 	SimpleDominance<Variable<Integer>> comparator = new SimpleDominance<>();
 	BinaryTournament<Variable<Integer>> selectionOp = new BinaryTournament<>(comparator);
 
-        SimpleGeneticAlgorithm<Variable<Integer>> ga = new SimpleGeneticAlgorithm<>(problem, 4, 4, true, mutationOp, crossoverOp, selectionOp);
+        SimpleGeneticAlgorithm<Variable<Integer>> ga = new SimpleGeneticAlgorithm<>(problem, 4, 4, true, mutationOp, crossoverOp, selectionOp, "");
         ga.initialize();
 
         // Now the master/worker

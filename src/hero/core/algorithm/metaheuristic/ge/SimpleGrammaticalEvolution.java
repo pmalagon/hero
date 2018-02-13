@@ -49,7 +49,7 @@ public class SimpleGrammaticalEvolution extends Algorithm<Variable<Integer>> {
         BinaryTournament<Variable<Integer>> selectionOp = new BinaryTournament<>(comparator);
 
         algorithm = new SimpleGeneticAlgorithm<>(problem,
-                maxPopulationSize, maxGenerations, true, mutationOperator, crossoverOperator, selectionOp);
+                maxPopulationSize, maxGenerations, true, mutationOperator, crossoverOperator, selectionOp, "");
 
     }
 

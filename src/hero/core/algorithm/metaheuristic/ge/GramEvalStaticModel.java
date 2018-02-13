@@ -112,7 +112,7 @@ public class GramEvalStaticModel extends AbstractProblemGE {
     @Override
     public void evaluate(Solutions<Variable<Integer>> solutions) {
         try {
-            this.generateCodeAndCompile(solutions)
+            this.generateCodeAndCompile(solutions);
             flag=1;
             String fitPath = "test" + File.separator +"fitGESM.csv"; 
             BufferedReader reader = new BufferedReader(new FileReader(new File(fitPath)));
@@ -181,10 +181,10 @@ public class GramEvalStaticModel extends AbstractProblemGE {
         SinglePointCrossover<Variable<Integer>> crossoverOperator = new SinglePointCrossover<>(problem, SinglePointCrossover.DEFAULT_FIXED_CROSSOVER_POINT, SinglePointCrossover.DEFAULT_PROBABILITY, SinglePointCrossover.AVOID_REPETITION_IN_FRONT);
         SimpleDominance<Variable<Integer>> comparator = new SimpleDominance<>();
         BinaryTournament<Variable<Integer>> selectionOp = new BinaryTournament<>(comparator);
-        SimpleGeneticAlgorithm<Variable<Integer>> algorithm = new SimpleGeneticAlgorithm<>(problem, numIndividuals, numGenerations, true, mutationOperator, crossoverOperator, selectionOp);
+      /*  SimpleGeneticAlgorithm<Variable<Integer>> algorithm = new SimpleGeneticAlgorithm<>(problem, numIndividuals, numGenerations, true, mutationOperator, crossoverOperator, selectionOp);
         algorithm.initialize();
         Solutions<Variable<Integer>> solutions = algorithm.execute();
         LOGGER.info("Solutions[0] with fitness " + solutions.get(0).getObjective(0));
-        LOGGER.info("Solutions[0] with expression " + problem.generatePhenotype(solutions.get(0)).toString());
+        LOGGER.info("Solutions[0] with expression " + problem.generatePhenotype(solutions.get(0)).toString());*/
     }
 }

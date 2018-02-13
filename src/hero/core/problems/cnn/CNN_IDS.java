@@ -158,7 +158,7 @@ public class CNN_IDS extends Problem<Variable<Integer>> {
     }
 
     public CNN_IDS clone() {
-        CNN_IDS clone = new CNN_IDS(this.numberOfVariables, this.numberOfFeatures);
+        CNN_IDS clone = new CNN_IDS(this.port, this.mode, this.numberOfVariables, this.numberOfFeatures);
         this.sol = 0;
         return clone;
     }

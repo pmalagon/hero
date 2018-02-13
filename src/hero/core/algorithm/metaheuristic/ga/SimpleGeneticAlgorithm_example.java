@@ -19,6 +19,8 @@
  */
 package hero.core.algorithm.metaheuristic.ga;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.logging.Level;
 import hero.core.operator.comparator.SimpleDominance;
 import hero.core.operator.crossover.CrossoverOperator;
@@ -35,77 +37,104 @@ import hero.core.problems.cnn.CNN_IDS;
 import hero.core.util.logger.HeroLogger;
 import java.util.logging.Logger;
 
+import static java.lang.System.exit;
+
 public class SimpleGeneticAlgorithm_example {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		//HeroLogger.setup("random_mc_nonorm.log", Level.FINE);
-                HeroLogger.setup(args[0], Level.FINE);
-                Logger logger = Logger.getLogger("");
-                int port = Integer.parseInt(args[1]);
-                int mode = Integer.parseInt(args[2]);
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+        //HeroLogger.setup("random_mc_nonorm.log", Level.FINE);
+        HeroLogger.setup(args[0], Level.FINE);
+        Logger logger = Logger.getLogger("");
+        int port = Integer.parseInt(args[1]);
+        int mode = Integer.parseInt(args[2]);
 
-                // First create the problem
-                CNN_IDS problem = new CNN_IDS(port, mode, 25, 23);
+        // First create the problem
+        CNN_IDS problem = new CNN_IDS(port, mode, 25, 23);
 
-                // Second create the algorithm
-                MutationOperator<Variable<Integer>> mutationOp;
-                CrossoverOperator<Variable<Integer>> crossoverOp;
+        // Second create the algorithm
 
-                if (mode == 1){
-                    mutationOp = new SwapMutation<>(0.1);
-                    crossoverOp = new RegionCrossover<>(problem);
-                } else {
-                    mutationOp = new IntegerFlipMutation<>(problem, 0.1);
-                    crossoverOp = new SinglePointCrossover<>(problem);
-                }
+        SimpleGeneticAlgorithm<Variable<Integer>> ga;
+        MutationOperator<Variable<Integer>> mutationOp;
+        CrossoverOperator<Variable<Integer>> crossoverOp;
+        SimpleDominance<Variable<Integer>> comparator = new SimpleDominance<>();
+        BinaryTournament<Variable<Integer>> selectionOp = new BinaryTournament<>(comparator);
 
-        		SimpleDominance<Variable<Integer>> comparator = new SimpleDominance<>();
-                BinaryTournament<Variable<Integer>> selectionOp = new BinaryTournament<>(comparator);
-		        SimpleGeneticAlgorithm<Variable<Integer>> ga = new SimpleGeneticAlgorithm<>(problem, 1000, 2000, true, mutationOp, crossoverOp, selectionOp, "/tmp/"+args[0]+".stop");
-		if (args.length > 3) {
-			Solutions<Variable<Integer>> solutions = new Solutions<Variable<Integer>>(); 
-			//Parse solutions from file
-			BufferedReader br = new BufferedReader(new FileReader("thefile.csv"));
-			String line = null;
-			while ((line = br.readLine()) != null) {
-				Solution<Variable<Integer>> solI = new Solution<Variable<Integer>>(numberOfObjectives);
-				String[] values = line.split(",");
-				for (String str : values) {
-					solI.getVariables().add(newVariable<Integer>(Integer.parseInt(str)));
-				}
-				solutions.add(solI);
-			}
-			br.close();
-			ga.initilize(solutions);
-		} else {
-                	ga.initialize();
-		}
 
-                long begin = System.currentTimeMillis();
-                
-                Solutions<Variable<Integer>> solutions = ga.execute();
-                for(Solution<Variable<Integer>> solution : solutions) {
-                    String sols = new String("Solution = ");
-                    //logger.info("Solution = ");
-                    for (int i = 0; i < problem.getNumberOfVariables(); ++i) {
-                        double xi = solution.getVariables().get(i).getValue();
-                        sols = sols.concat(xi+",");
+        if (mode == 1){
+            mutationOp = new SwapMutation<>(0.1);
+            crossoverOp = new RegionCrossover<>(problem);
+        } else {
+            mutationOp = new IntegerFlipMutation<>(problem, 0.1);
+            crossoverOp = new SinglePointCrossover<>(problem);
+        }
+
+        ga = new SimpleGeneticAlgorithm<>(problem, 500, 100, true, mutationOp, crossoverOp, selectionOp, "/tmp/"+args[0]+".stop");
+
+        try {
+            if (args.length > 3) {
+                String initialSolPath = args[3];
+                Solutions<Variable<Integer>> solutions = new Solutions<>();
+                //Parse solutions from file
+
+                BufferedReader br = new BufferedReader(new FileReader(initialSolPath));
+                String line;
+                boolean fitness_line = false;
+                Solution<Variable<Integer>> solI = null;
+                while ((line = br.readLine()) != null) {
+                    if (fitness_line) {
+                        solI.getObjectives().set(0, Double.parseDouble(line));
+                        solutions.add(solI);
+                    } else {
+                        solI = new Solution<>(1);
+
+                        String[] values = line.split(",");
+                        for (String str : values) {
+                            solI.getVariables().add(new Variable<>((int)(Double.parseDouble(str))));
+                        }
                     }
-                    logger.info(sols);
-                    logger.info("Fitness = " + solution.getObjectives().get(0));
+                    fitness_line = !fitness_line;
                 }
+                br.close();
+                ga.initialize(solutions);
+            } else {
+                ga.initialize();
+            }
 
-                long end = System.currentTimeMillis();
-                logger.info("Time: " + ((end - begin) / 1000.0) + " seconds");
+        } catch (Exception e){
+            exit(1);
+        }
 
-		//for(Solution<Variable<Integer>> solution : solutions) {
-		//	System.out.println("Fitness = " + solution.getObjectives().get(0));
-		//}
-		//System.out.println("solutions.size()="+ solutions.size());
-		//System.out.println(solutions.toString());
-		//System.out.println("solutions.size()="+ solutions.size());
-	}
+
+
+        //ga.initialize();
+
+        long begin = System.currentTimeMillis();
+
+        Solutions<Variable<Integer>> solutions = ga.execute();
+        for(Solution<Variable<Integer>> solution : solutions) {
+            String sols = new String("Solution = ");
+            //logger.info("Solution = ");
+            for (int i = 0; i < problem.getNumberOfVariables(); ++i) {
+                double xi = solution.getVariables().get(i).getValue();
+                sols = sols.concat(xi+",");
+            }
+            logger.info(sols);
+            logger.info("Fitness = " + solution.getObjectives().get(0));
+        }
+
+        long end = System.currentTimeMillis();
+        logger.info("Time: " + ((end - begin) / 1000.0) + " seconds");
+
+
+
+        //for(Solution<Variable<Integer>> solution : solutions) {
+        //	System.out.println("Fitness = " + solution.getObjectives().get(0));
+        //}
+        //System.out.println("solutions.size()="+ solutions.size());
+        //System.out.println(solutions.toString());
+        //System.out.println("solutions.size()="+ solutions.size());
+    }
 }

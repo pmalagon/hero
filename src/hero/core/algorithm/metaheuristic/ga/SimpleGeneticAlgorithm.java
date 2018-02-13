@@ -50,7 +50,7 @@ public class SimpleGeneticAlgorithm<V extends Variable<?>> extends Algorithm<V> 
     protected CrossoverOperator<V> crossoverOperator;
     protected SelectionOperator<V> selectionOperator;
 
-    public SimpleGeneticAlgorithm(Problem<V> problem, Integer maxPopulationSize, Integer maxGenerations, Boolean stopWhenSolved, MutationOperator<V> mutationOperator, CrossoverOperator<V> crossoverOperator, SelectionOperator<V> selectionOperatori, String stopFilePath) {
+    public SimpleGeneticAlgorithm(Problem<V> problem, Integer maxPopulationSize, Integer maxGenerations, Boolean stopWhenSolved, MutationOperator<V> mutationOperator, CrossoverOperator<V> crossoverOperator, SelectionOperator<V> selectionOperator, String stopFilePath) {
         super(problem);
         this.maxGenerations = maxGenerations;
         this.maxPopulationSize = maxPopulationSize;
@@ -65,10 +65,10 @@ public class SimpleGeneticAlgorithm<V extends Variable<?>> extends Algorithm<V> 
     public void initialize(Solutions<V> initialSolutions) {
         if (initialSolutions == null) {
             population = problem.newRandomSetOfSolutions(maxPopulationSize);
+            problem.evaluate(population);
         } else {
             population = initialSolutions;
         }
-        problem.evaluate(population);
         leaders = new Solutions<>();
         for (Solution<V> solution : population) {
             leaders.add(solution.clone());

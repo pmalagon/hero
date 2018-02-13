@@ -233,7 +233,7 @@ public class GramEvalTemporalModel extends AbstractProblemGE {
         SinglePointCrossover<Variable<Integer>> crossoverOperator = new SinglePointCrossover<>(problem, SinglePointCrossover.DEFAULT_FIXED_CROSSOVER_POINT, SinglePointCrossover.DEFAULT_PROBABILITY, SinglePointCrossover.AVOID_REPETITION_IN_FRONT);
         SimpleDominance<Variable<Integer>> comparator = new SimpleDominance<>();
         BinaryTournament<Variable<Integer>> selectionOp = new BinaryTournament<>(comparator);
-        SimpleGeneticAlgorithm<Variable<Integer>> algorithm = new SimpleGeneticAlgorithm<>(problem, numIndividuals, numGenerations, true, mutationOperator, crossoverOperator, selectionOp);
+        SimpleGeneticAlgorithm<Variable<Integer>> algorithm = new SimpleGeneticAlgorithm<>(problem, numIndividuals, numGenerations, true, mutationOperator, crossoverOperator, selectionOp, "");
         algorithm.initialize();
         algorithm.execute();
     }
